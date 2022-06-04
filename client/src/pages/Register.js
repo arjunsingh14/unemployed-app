@@ -14,12 +14,18 @@ const Register = () => {
   const navigate = useNavigate();
   const [values, setValues] = useState(initialState);
   //global state and useNavigate
-  const {  user, showAlert, displayAlert, registerUser, isLoading } =
+  const {  user, showAlert, displayAlert, registerUser, isLoading, loginUser } =
     useAppContext();
   const handleChange = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
-
+  useEffect(() => {
+    if (user) {
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
+    }
+  }, [user, navigate]);
   const handleSubmit = (e) => {
     e.preventDefault();
     const { name, email, password, isUser } = values;
@@ -29,22 +35,13 @@ const Register = () => {
     }
     const currentUser = { name, email, password };
     if (isUser) {
-      console.log("already a user");
+      loginUser(currentUser);
     } else {
       registerUser(currentUser);
     }
   };
-  useEffect(() => {
-    if(user){
-        setTimeout(()=>{
-
-            navigate('/')
-        }, 2000)
-    }
-  }, [user, navigate])
   const toggleUser = () => {
     setValues({ ...values, isUser: !values.isUser });
-    console.log(showAlert)
   };
   return (
     <Wrapper className="full-page">
