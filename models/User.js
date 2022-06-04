@@ -32,7 +32,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please provide password"],
     minlength: 6,
-    select: false
+    select: false,
   },
   location: {
     type: String,
@@ -47,10 +47,16 @@ UserSchema.pre("save", async function () {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
+UserSchema.methods.comparePassword = async function (userPassword) {
+  const isMatch = await bcrypt.compare(userPassword, this.password);
+  return isMatch;
+};
+
 UserSchema.methods.createJWT = function () {
   return jwt.sign({ userID: this._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_LIFETIME
+    expiresIn: process.env.JWT_LIFETIME,
   });
 };
+
 
 export default mongoose.model("User", UserSchema);
