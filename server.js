@@ -1,5 +1,6 @@
 import express from "express";
 import 'express-async-errors'
+import morgan from 'morgan';
 import notFoundMiddleware from "./middleware/notFound.js";
 import errorHandlerMiddleware from "./middleware/error-handler.js";
 import dotenv from "dotenv";
@@ -10,10 +11,15 @@ dotenv.config();
 const app = express();
 app.use(express.json())
 
-
+if (process.env.NODE_ENV !=="production"){
+    app.use(morgan('dev'))
+}
 
 app.get("/", (req, res) => {
   res.send("welcome");
+});
+app.get("/api/v1", (req, res) => {
+  res.send("API");
 });
 
 //using routes with base URL
