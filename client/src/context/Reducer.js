@@ -7,8 +7,10 @@ import {
   LOGIN_USER_BEGIN,
   LOGIN_USER_ERROR,
   LOGIN_USER_SUCCESS,
+  TOGGLE_SIDEBAR,
+  LOGOUT_USER,
 } from "./actions";
-
+import { initialState } from "./appContext";
 const reducer = (state, action) => {
   if (action.type === DISPLAY_ALERT) {
     return {
@@ -34,8 +36,8 @@ const reducer = (state, action) => {
       userLocation: action.payload.location,
       jobLocation: action.payload.location,
       showAlert: true,
-      alertText:"Success! Redirecting...",
-      alertType: "success"
+      alertText: "Success! Redirecting...",
+      alertType: "success",
     };
   }
   if (action.type === REGISTER_USER_ERROR) {
@@ -43,8 +45,8 @@ const reducer = (state, action) => {
       ...state,
       isLoading: false,
       showAlert: true,
-      alertText:action.payload.msg,
-      alertType: "danger"
+      alertText: action.payload.msg,
+      alertType: "danger",
     };
   }
   if (action.type === LOGIN_USER_BEGIN) {
@@ -59,8 +61,8 @@ const reducer = (state, action) => {
       userLocation: action.payload.location,
       jobLocation: action.payload.location,
       showAlert: true,
-      alertText:"Success! Redirecting...",
-      alertType: "success"
+      alertText: "Success! Redirecting...",
+      alertType: "success",
     };
   }
   if (action.type === LOGIN_USER_ERROR) {
@@ -68,8 +70,22 @@ const reducer = (state, action) => {
       ...state,
       isLoading: false,
       showAlert: true,
-      alertText:action.payload.msg,
-      alertType: "danger"
+      alertText: action.payload.msg,
+      alertType: "danger",
+    };
+  }
+  if (action.type === TOGGLE_SIDEBAR) {
+    return {
+      ...state,
+      showSidebar: !state.showSidebar,
+    };
+  }
+  if (action.type === LOGOUT_USER) {
+    return {
+      ...initialState,
+      user: null,
+      location: null,
+      token: null,
     };
   }
   throw new Error(`no such action: ${action}`);
