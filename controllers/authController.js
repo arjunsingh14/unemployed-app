@@ -31,23 +31,34 @@ const login = async (req, res) => {
     throw new BadRequestError("Please provide all values");
   }
   const user = await User.findOne({ email }).select("+password");
-  console.log(user)
+  console.log(user);
   if (!user) {
     throw new UnauthenticatedError("email/password is incorrect");
   }
   const isMatch = await user.comparePassword(password);
-  console.log(isMatch)
+  console.log(isMatch);
   if (isMatch) {
-    const token = user.createJWT()
+    const token = user.createJWT();
     user.password = undefined;
-    res.status(StatusCodes.OK).json({user, token, location: user.location})
-    res.json("login");
+    res.status(StatusCodes.OK).json({ user, token, location: user.location });
   } else {
     throw new UnauthenticatedError("email/password is incorrect");
   }
 };
 const updateUser = async (req, res) => {
-  res.send("update");
+  const { email, name, lastName, location } = req.body;
+  if (!email || !name || !lastName || !location) {
+    throw new BadRequestError("Please provide all values");
+  }
+  const user = await User.findOneAndUpdate({ _id: req.user.userId }, {
+      name: name,
+      email: email,
+      lastName: lastName,
+      location: location,
+  }, {new: true} )
+  console.log(user.name)
+  const token = user.createJWT();
+  res.status(StatusCodes.OK).json({ user, token, location: user.location });
 };
 
 export { register, login, updateUser };
