@@ -14,6 +14,11 @@ import {
   UPDATE_USER_SUCCESS,
   TOGGLE_SIDEBAR,
   LOGOUT_USER,
+  HANDLE_CHANGE,
+  CLEAR_VALUES,
+  CREATE_JOB_BEGIN,
+  CREATE_JOB_SUCCESS,
+  CREATE_JOB_ERROR,
 } from "./actions";
 import reducer from "./Reducer";
 
@@ -29,8 +34,16 @@ const initialState = {
   user: user ? JSON.parse(user) : null,
   token: token,
   userLocation: userLocation || "",
-  jobLocation: "",
   showSidebar: false,
+  isEditing: false,
+  jobId: "",
+  position: "",
+  company: "",
+  jobLocation: userLocation || "",
+  jobTypeOptions: ["full-time", "part-time", "remote", "internship"],
+  jobType: "full-time",
+  statusOptions: ["interview", "declined", "pending"],
+  status: "pending",
 };
 
 const AppContext = React.createContext();
@@ -74,6 +87,12 @@ const AppProvider = ({ children }) => {
   const clearAlert = () => {
     setTimeout(() => dispatch({ type: CLEAR_ALERT }), 3000);
   };
+  const handleChange = ({name, value}) => {
+    dispatch({type: HANDLE_CHANGE, payload: {name, value}})
+  }
+  const clearValues = () => {
+    dispatch({type: CLEAR_VALUES})
+  }
   const addUserToLocalStorage = (user, token, location) => {
     localStorage.setItem("user", JSON.stringify(user));
     localStorage.setItem("token", token);
@@ -140,6 +159,24 @@ const AppProvider = ({ children }) => {
     }
   };
 
+
+
+  const createJob = async () => {
+       dispatch({ type: CREATE_JOB_BEGIN });
+      try {
+          const { position, company, jobType, status, jobLocation } = state;
+          await authFetch.post("/jobs", { position, company, jobType, status, jobLocation });
+           dispatch({ type: CREATE_JOB_SUCCESS });
+            dispatch({ type: CLEAR_VALUES });
+      } catch (error) {
+          if (error.response.msg === 401){
+              dispatch({type: CREATE_JOB_ERROR, payload:{msg:error.response.data.msg}})
+          }
+      }
+      clearAlert();
+      
+  }
+
   return (
     <AppContext.Provider
       value={{
@@ -151,6 +188,9 @@ const AppProvider = ({ children }) => {
         toggleSidebar,
         logoutUser,
         updateUser,
+        handleChange,
+        clearValues,
+        createJob
       }}
     >
       {children}
