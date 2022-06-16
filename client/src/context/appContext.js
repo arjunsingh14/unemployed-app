@@ -21,6 +21,11 @@ import {
   CREATE_JOB_ERROR,
   GET_JOB_BEGIN,
   GET_JOB_SUCCESS,
+  SET_EDIT_JOB,
+  DELETE_JOB_BEGIN,
+  EDIT_JOB_BEGIN,
+  EDIT_JOB_SUCCESS,
+  EDIT_JOB_ERROR
 } from "./actions";
 import reducer from "./Reducer";
 
@@ -39,6 +44,7 @@ const initialState = {
   showSidebar: false,
   isEditing: false,
   jobId: "",
+  editJobId:"", 
   position: "",
   company: "",
   jobLocation: userLocation || "",
@@ -204,15 +210,34 @@ const AppProvider = ({ children }) => {
     clearAlert();
   };
 
-
-    const setEditJobs = (id) => {
-        console.log(`Edit ${id}`)
+  const setEditJobs = (id) => {
+    dispatch({ type: SET_EDIT_JOB, payload: { id } });
+  };
+  const editJob = async () => {
+    dispatch({type: EDIT_JOB_BEGIN})
+    try {
+        const {company, position, jobType, jobLocation, status} = state;
+        await authFetch.patch(`/jobs/${state.editJobId}`, {company, position, jobType, jobLocation, status} )
+        dispatch({type: EDIT_JOB_SUCCESS})
+        dispatch({type: CLEAR_VALUES})
+        clearAlert();
+    } catch (error) {
+        dispatch({ type: EDIT_JOB_ERROR, payload: error.response.data.msg });
     }
-    
-    const deleteJob = (id) => {
-      console.log(`delete ${id}`);
-    };
+  }
+  const deleteJob = async (id) => {
+    dispatch({type: DELETE_JOB_BEGIN});
+    try {
+        await authFetch.delete(`/jobs/${id}`);
+         getJobs();
+    } catch (error) {
+        logoutUser();
+    }
+   
+  };
 
+
+ 
   return (
     <AppContext.Provider
       value={{
@@ -229,7 +254,8 @@ const AppProvider = ({ children }) => {
         createJob,
         getJobs,
         setEditJobs,
-        deleteJob
+        deleteJob,
+        editJob
       }}
     >
       {children}
