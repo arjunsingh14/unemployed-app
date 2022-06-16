@@ -17,7 +17,8 @@ const AddJob = () => {
     isEditing,
     handleChange,
     clearValues,
-    createJob
+    createJob,
+    editJob
   } = useAppContext();
 
   const handleInput = (e) => {
@@ -29,6 +30,14 @@ const AddJob = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!position || !company || !jobLocation){
+        displayAlert();
+        return
+    }
+    if (isEditing){
+        editJob();
+        return
+    }
     createJob();
   };
 
@@ -85,7 +94,7 @@ const AddJob = () => {
                 e.preventDefault();
                 clearValues();
               }}
-            ></button>
+            >Clear</button>
           </div>
         </div>
       </form>
